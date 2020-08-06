@@ -1,8 +1,17 @@
+import axios from 'axios'
 /*
   STEP 1: using axios, send a GET request to the following URL
     (replacing the placeholder with your Github name):
     https://api.github.com/users/<your name>
 */
+
+axios.get('https://api.github.com/users/EdwardEJ')
+  .then(response => {
+    cardMaker(response.data);
+  })
+  .catch(err => {
+    console.log(err);
+  })
 
 /*
   STEP 2: Inspect and study the data coming back, this is YOUR
@@ -17,6 +26,8 @@
     and append the returned markup to the DOM as a child of .cards
 */
 
+
+
 /*
   STEP 5: Now that you have your own card getting added to the DOM, either
     follow this link in your browser https://api.github.com/users/<Your github name>/followers,
@@ -28,29 +39,104 @@
     user, and adding that card to the DOM.
 */
 
-const followersArray = [];
+const followersArray = ['tetondan', 'dustinmyers', 'justsml', 'luishrd', 'bigknell'];
+
+followersArray.forEach(follower => {
+  axios.get(`https://api.github.com/users/${follower}`)
+    .then(response => {
+      const followers = response.data;
+      cardMaker(followers)
+    })
+    .catch(err => {
+      console.log(err)
+    })
+})
+
+
+axios.get(`https://api.github.com/users/EdwardEJ/followers`) //object
+  .then(response => { //object
+    const followersArray = response.data; //[array]
+
+    followersArray.forEach(follower => {
+      cardMaker(follower)
+    })
+  })
+  .catch(err => {
+    console.log(err)
+  })
 
 /*
   STEP 3: Create a function that accepts a single object as its only argument.
     Using DOM methods and properties, create and return the following markup:
-
-    <div class="card">
-      <img src={image url of user} />
-      <div class="card-info">
-        <h3 class="name">{users name}</h3>
-        <p class="username">{users user name}</p>
-        <p>Location: {users location}</p>
-        <p>Profile:
+ 
+    <div class="card">                            //card
+      <img src={image url of user} />             //cardImg
+      <div class="card-info">                     //cardInfo //
+        <h3 class="name">{users name}</h3>        //cardName
+        <p class="username">{users user name}</p> //cardUserName
+        <p>Location: {users location}</p>         //cardLocation
+        <p>Profile:                               //cardProfile
+                                                  //cardHTMLURL
           <a href={address to users github page}>{address to users github page}</a>
         </p>
-        <p>Followers: {users followers count}</p>
-        <p>Following: {users following count}</p>
-        <p>Bio: {users bio}</p>
+        <p>Followers: {users followers count}</p> //cardFollowers
+        <p>Following: {users following count}</p> //cardFollowing
+        <p>Bio: {users bio}</p>                   //cardBio
       </div>
     </div>
 */
 
+function cardMaker(cardObj) {
+
+  const card = document.createElement('div');
+  const cardImg = document.createElement('img');
+  const cardInfo = document.createElement('div');
+  const cardName = document.createElement('h3');
+  const cardUserName = document.createElement('p');
+  const cardLocation = document.createElement('p');
+  const cardProfile = document.createElement('p'); //
+  const cardHtmlURL = document.createElement('a'); //
+  const cardFollowers = document.createElement('p');
+  const cardFollowing = document.createElement('p');
+  const cardBio = document.createElement('p');
+
+
+  cardName.textContent = cardObj.name;
+  cardHtmlURL.textContent = cardObj.html_url;
+  cardUserName.textContent = cardObj.login;
+  cardLocation.textContent = `Location: ${cardObj.location}`;
+  cardProfile.textContent = 'Profile: ';
+  cardFollowers.textContent = `Followers: ${cardObj.followers}`;
+  cardFollowing.textContent = `Following: ${cardObj.following}`;
+  cardBio.textContent = `Bio: ${cardObj.bio}`;
+
+  card.classList.add('card')
+  cardInfo.classList.add('cardInfo')
+  cardName.classList.add('name')
+  cardUserName.classList.add('username')
+
+  cardImg.setAttribute('src', cardObj.avatar_url);
+  cardHtmlURL.setAttribute('href', cardObj.html_url)
+
+  card.appendChild(cardImg)
+  card.appendChild(cardInfo)
+  cardInfo.appendChild(cardName)
+  cardInfo.appendChild(cardUserName)
+  cardInfo.appendChild(cardLocation)
+  cardInfo.appendChild(cardProfile)
+  cardProfile.appendChild(cardHtmlURL)
+  cardInfo.appendChild(cardFollowers)
+  cardInfo.appendChild(cardFollowing)
+  cardInfo.appendChild(cardBio)
+
+  const cards = document.querySelector('.cards')
+  cards.appendChild(card)
+
+  return card
+}
+
 /*
+
   List of LS Instructors Github username's:
     tetondan
     dustinmyers
